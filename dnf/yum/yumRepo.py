@@ -259,7 +259,8 @@ class YumRepository(Repository, config.RepoConf):
         self.repo_config_age = 0 # if we're a repo not from a file then the
                                  # config is very, very old
         # throw in some stubs for things that will be set by the config class
-        self.basecachedir = ""
+        self.cachedir = None
+        self.fallback_cachedir = None
         self.base_persistdir = ""
         self.cost = 1000
         self.copy_local = 0
@@ -291,6 +292,7 @@ class YumRepository(Repository, config.RepoConf):
         self._grabfunc = None
         self._grab = None
         self.hawkey_repo = None
+        self.cache_c = None
 
     def __cmp__(self, other):
         """ Sort yum repos. by cost, and then by alphanumeric on their id. """
@@ -381,10 +383,10 @@ class YumRepository(Repository, config.RepoConf):
                         'callback', 'confirm_func', 'groups_added',
                         'interrupt_callback', 'id', 'mirror_failure_obj',
                         'repo_config_age', 'groupsfilename', 'copy_local',
-                        'basecachedir', 'http_headers', 'metadata_cookie',
+                        'cachedir', 'http_headers', 'metadata_cookie',
                         'metadata_cookie_fn', 'quick_enable_disable',
                         'repoMDFile', 'timestamp_check', 'urls', 'mirrorurls',
-                        'yumvar', 'repofile')
+                        'yumvar', 'repofile', 'fallback_cachedir')
         for attr in dir(self):
             if attr.startswith('_'):
                 continue
@@ -542,7 +544,7 @@ class YumRepository(Repository, config.RepoConf):
     def dirSetup(self):
         """make the necessary dirs, if possible, raise on failure"""
 
-        cachedir = os.path.join(self.basecachedir, self.id)
+        cachedir = os.path.join(self.cachedir, self.id)
         persistdir = os.path.join(self.base_persistdir, self.id)
         pkgdir = os.path.join(cachedir, 'packages')
         hdrdir = os.path.join(cachedir, 'headers')
